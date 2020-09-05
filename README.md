@@ -167,7 +167,7 @@ Nos permite una opción entre las que se nos aparecen en pantalla.
 - **[/D predeterminado]**: Indica la opción por defecto que se escogerá tras un determinado tiempo, esta opción debe estar incluida en el /C.  
 - **[Texto]**: Muestra el texto que le aparecerá al usuarario a la hora de elegir opciones.  
 
-Para ejecutar la opción que escogimos debemos usar un IF ERRORLEVEL.  
+Para ejecutar la opción que escogimos debemos usar un IF ERRORLEVEL, y el código del errorlevel **irá desde la última opción a la primera**.  
 
 ```bat
 @ECHO OFF
@@ -194,8 +194,64 @@ IF ERRORLEVEL 2 GOTO salir
 IF ERRORLEVEL 1 GOTO inicio
 ```
 
+## SET
 
+El comando **SET** nos permite crear variables de entorno que se utilizan para controlar algunos programas.  
 
+**Sintaxis**
+- SET [parametro] [nombre=[string]]  
 
+**Explicación**
+- **[parametro]**: Este parámetro puede ser **/a** o **/p**, el primero se utiliza para definir valores númericos, en el caso de la segunda opción del atributo el string será el texto que aparecerá antes de introducir el valor de la variable. Es decir **/p** lee los valores del teclado.  
+- **[nombre=[string]]**: Establece un nombre de la variable y le atribuye un valor.  
 
+```bat
+@ECHO OFF
+
+:errorname
+SET /p name="Pon tu nombre: "
+IF "%name%"=="" GOTO errorname
+
+ECHO Hola %name%
+```
+
+Este script te saluda pidiendote el nombre por una variable de entorno y comprueba si escribiste un valor o lo dejaste vacío.  
+
+## FOR
+Se utiliza para realizar bucles hasta que se cumpla una determinada condición.  
+
+**Sintaxis**
+- FOR [parametros] %%variable IN (conjunto) DO comando
+
+**Explicación**  
+- **[parametros]**: 
+	- **/F**: Da la opción de recorrer las líneas de un fichero de texto y almacenarlas en la variable contenedora %%, el /F hay que utilizarlo junto con "tokens=*"
+	- **/L**: Permite especificar un rango en el **conjunto** (inicio,salto,final). El conjunto (2,3,50) irá desde el 2 al 50 dando saltos de 3 en 3.  
+	- **/R**: Nos permite especificar una ruta en la que se ejecutará el comando.  
+	
+- **%%variable**: Almacena cada uno de los valores del conjunto.  
+- **(conjunto)**: El conjunto puede ser una serie de archivos sobre los que se aplicará un comando, una serie de números o un rango si utilizamos el /L.  
+
+```bat
+@ECHO OFF
+
+FOR /L %%i IN (1,2,100) DO ECHO %%i
+FOR %%i IN (exe com bat) DO DIR *.%%i
+FOR %%i IN (txt) DO (
+	TYPE *.%%i
+	)
+```
+
+Este archivo mostraría los números del uno al cien yendo de dos en dos, depués mostraría todos los .exe, .com y .bat del directorio actual y por último mostrara por pantalla todo el contenido de todos los .txt.  
+
+## CALL o START
+
+Ambas instrucciones tienen la misma utilidad, ejecutar un programa externo al archivo bat que se está ejecutando.  
+
+**Sintaxis**
+- CALL nombreDelProgama  
+> START tiene la misma sintaxis pero tiene muchos más atributos posibles que lo hacen más versatil, para ver todo los atributos basta con poner *start /?* en el cmd
+
+**Explicación**  
+Estos comandos permiten ejecutar un programa y posteriormente una vez este se ejecute vuelve al bat y continúa con la línea de ejecución. Si no se pusiera ninguno de estos dos comandos y se pusiera directamente el nombre del archivo la línea de ejecución finalizaría con el programa, ya que CALL y START hacen que continúe la ejecución.  
 
