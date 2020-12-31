@@ -1,0 +1,8 @@
+@ECHO OFF
+
+NETSH INTERFACE SHOW INTERFACE
+
+SET /P interfaceName=Nombre de la interfaz: 
+
+NETSH INTERFACE SET INTERFACE "%interfaceName%" DISABLED
+NETSH INTERFACE SET INTERFACE "%interfaceName%" ENABLED
