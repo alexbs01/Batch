@@ -4,7 +4,8 @@ ECHO **************
 ECHO * REQUISITOS *
 ECHO **************
 ECHO.
-ECHO ES OBLIGATORIO QUE EN TODA LA RUTA DE LA MAQUINA VIRTUAL NO HAYA ESPACIOS
+ECHO 1. ES OBLIGATORIO QUE EN TODA LA RUTA DE LA MAQUINA VIRTUAL NO HAYA ESPACIOS
+ECHO 2. Poner este .bat en la ruta en la que se encuentran las máquinas
 ECHO.
 ECHO *****************
 ECHO * Instrucciones *
@@ -23,8 +24,7 @@ START direcciones.txt
 PAUSE
  
 FOR /F %%i IN (direcciones.txt) DO (
-	START C:\"Program Files"\Oracle\VirtualBox\vboxmanage registervm %%i
-	IF %ERRORLEVEL% == 0 ECHO Maquina %%i anhadida
+	START C:\"Program Files"\Oracle\VirtualBox\vboxmanage registervm %%i && ECHO Maquina %%i anhadida
 )
 
 DEL direcciones.txt
