@@ -1,26 +1,30 @@
 @ECHO OFF
-:: Poner la maquina virtual con 256 MB de memoria grafica
-:: graficaVB "<NombreMaquina1>" "<NombreMaquina2>"...
-:: Poner el nombre entre comillas
-CLS
-
-IF "%1"=="" GOTO instrucciones
-
-:siguienteMaquina
-
-START C:\"Program Files"\Oracle\VirtualBox\VBoxManage modifyvm %1 --vram 256
-ECHO La memoria virtual de la maquina %1 se actualizo.
 ECHO.
-
-SHIFT
-IF "%1"=="" GOTO fin
-
-GOTO siguienteMaquina
-
-:instrucciones
+ECHO **************
+ECHO * REQUISITOS *
+ECHO **************
 ECHO.
-ECHO La sintaxis es:
-ECHO graficaVB "<NombreMaquina1>" "<NombreMaquina2>"...
+ECHO ES OBLIGATORIO QUE EN TODA LA RUTA DE LA MAQUINA VIRTUAL NO HAYA ESPACIOS
 ECHO.
+ECHO *****************
+ECHO * Instrucciones *
+ECHO *****************
+ECHO.
+ECHO 1. Cuando se abra el archivo de texto borra las rutas de las maquinas de las que no quieras modificar la VRAM
+ECHO 2. Cuando en el .txt solo haya la maquinas deseadas GUARDA el archivo y cierralo
+ECHO 3. Despues pulsa ENTER
+ECHO.
+PAUSE
 
-:fin
+DIR /B /S *.vbox >> direccionesVMAumentoGrafica.txt
+
+START direccionesVMAumentoGrafica.txt
+
+PAUSE
+ 
+FOR /F %%i IN (direccionesVMAumentoGrafica.txt) DO (
+	START C:\"Program Files"\Oracle\VirtualBox\vboxmanage modifyvm %%i --vram 256
+	IF %ERRORLEVEL% == 0 ECHO Maquina %%i con VRAM cambiada a 256
+)
+
+DEL direccionesVMAumentoGrafica.txt
