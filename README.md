@@ -11,13 +11,15 @@ Los archivos Batch son ficheros de texto que contienen comandos de Windows que p
 3. Luego si es un archivo *.bat* que está en el directoio actual.  
 4. Finalmente, si no se cumplen ninguno de estos pasos, revisa en todos los directorios de que se alojan en la variable **PATH**.  
 
-Sabiendo esto, es recomendable disponer de una carpeta que almacene todos los bats, para ello podemos crear una carpeta en C:\ con este propósito y añadirlo a la variable de entorno PATH.  
+Sabiendo esto, es recomendable disponer de una carpeta que almacene todos los bats, para ello podemos crear una carpeta en C:\ con este propósito y añadirlo a la variable de entorno PATH. Pero esta ruta o cualquiera que se añada al Path de esta forma solo estará accesible mientras dure la sesión en consolo, por lo que una vez se cierre habría que volver a ejecutar el comando correspondiente para añadir la ruta al Path de nuevo. Esto es útil cuando se están usando comandos externos de un programa que no pertenece a Windows y queremos hacer un script que use estos comandos.  
 
 ```cmd
 C:\>mkdir Bats
 
 C:\>set path=%path%; C:\Bats
 ```
+
+Para añadir de forma permanente una ruta al Path tendremos que añadir la ruta que sea a las variables de entorno. Yendo a las propiedades del equipo, y luego, en configuración avanzada del sistema.  
 
 ## Como evitar ver las instrucciones en el cmd
 Si ejecutamos un bat veremos en el cmd que instrucciones realiza en cada momento, por lo que si no queremos que se vea al inicio del bat, la primera línea será:  
@@ -225,7 +227,11 @@ Se utiliza para realizar bucles hasta que se cumpla una determinada condición.
 
 **Explicación**  
 - **[parametros]**: 
-	- **/F**: Da la opción de recorrer las líneas de un fichero de texto y almacenarlas en la variable contenedora %%, el /F hay que utilizarlo junto con "tokens=*"
+	- **/F**: Da la opción de recorrer las líneas de un fichero de texto y almacenarlas en la variable contenedora %%. Se puede utilizar con "eol", "skip", "delims", "tokens".
+		- **eol=c**: Indica que caracter hace que la línea sea un comentario, este caracter tiene que iniciar la línea.  
+		- **skip=n**: Especificando un número indica cuantas líneas del comienzo del archivo se salta.  
+		- **delims=c**: Espcificando un caracter o unos pocos indicamos, que caracteres dividirán las líneas en bloques para usar junto con el parámentro *tokens*.  
+		- **tokens=x,y,m-n**: Los valores x, y, z y sucesivos asignan el número corresondiente de cada línea al parámetro %%i, %%j, %%k o el que se asigne como inicio. m-n indica lo mismo solo que en un intervalo desde m hasta n.  
 	- **/L**: Permite especificar un rango en el **conjunto** (inicio,salto,final). El conjunto (2,3,50) irá desde el 2 al 50 dando saltos de 3 en 3.  
 	- **/R**: Nos permite especificar una ruta en la que se ejecutará el comando.  
 	
@@ -254,4 +260,48 @@ Ambas instrucciones tienen la misma utilidad, ejecutar un programa externo al ar
 
 **Explicación**  
 Estos comandos permiten ejecutar un programa y posteriormente una vez este se ejecute vuelve al bat y continúa con la línea de ejecución. Si no se pusiera ninguno de estos dos comandos y se pusiera directamente el nombre del archivo la línea de ejecución finalizaría con el programa, ya que CALL y START hacen que continúe la ejecución.  
+
+CALL se ejecuta en la misma ventana en la que se usa y también se puede utilizar para llamar a funciones. Para que START se ejecute en la misma ventana que en la que se ejecuta hay que utilizarlo junto con el parámetro /B.  
+
+## Funciones
+
+Las funciones como en muchos lenguajes de programación se pueden usar para reutilizar código de una forma fácil. Como recomendación personal si se hace un script con un único archivo, poner todas las funciones al inicio del archivo.  
+
+```bat
+@ECHO OFF&CALL:inicio&GOTO:EOF
+:funcion1
+	:: Codigo de la funcion 1
+GOTO:EOF
+
+:funcion2
+	:: Codigo de la funcion 2
+GOTO:EOF
+
+:incio
+	:: Programa principal
+	CALL:funcion2
+	CALL:funcion1
+```
+
+Como siempre el programa leerá la primera línea de ```@ECHO OFF``` para que no muestre el código que está ejecutando en ese momento, luego se llamará a la "función principal" que se llama inicio, y una vez esta finalice se terminará el programa. En el código de antes una vez se lea la primera línea saltará directamente a la etiqueta ```:inicio``` y ejecutará las instrucciones que estén escritas, en este caso primero se ejecutará la funcion2 y después la funcion1. El fin de la función se indica con GOTO:EOF.  
+A estas funciones también se les pueden pasar valores que tomarán forma de parámetros.  
+
+```bat
+@ECHO OFF&CALL:inicioCalculadora&GOTO:EOF
+:suma
+	SET /A solucion=%1 + %2
+	ECHO %solucion%
+GOTO:EOF
+
+:resta
+	SET /A solucion=%1 - %2
+	ECHO %solucion%
+GOTO:EOF
+
+:inicioCalculadora
+	SET /P numeros="Pon dos numeros separados por un espacio: "
+	CHOICE /C SR /M "Escoge Suma o Resta"
+	IF ERRORLEVEL 2 CALL:resta %numeros%
+	IF ERRORLEVEL 1 CALL:suma %numeros%
+```
 
