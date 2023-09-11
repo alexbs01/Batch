@@ -1,0 +1,5 @@
+net localgroup <nombreDelRol> "nombreDeUsuario" /add
+net localgroup <nombreDelRol> "nombreDeUsuario" /delete
+
+:: Añade o quita a un usuario de un grupo, como puede ser el de 
+:: administradores
